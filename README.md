@@ -25,6 +25,30 @@ FormalinWeibo会读取这个文件里面的微博展示。
 ```bash
 pip install -r requirements.txt
 ```
+
+如果安装出现问题(没有问题直接跳到step3)，建议最好在venv环境下进行，先建立venv:
+```bash
+python3 -m venv venv
+```
+然后再激活venv:
+
+在Linux/MacOS下
+```bash
+source venv/bin/activate
+```
+在Windows下
+```bash
+venv\Scripts\activate
+```
+完成后再重新安装依赖
+
+如果提示没有安装tkinter，则需要根据系统安装
+- **Ubuntu/Debian**: `sudo apt install python3-tk`
+- **Fedora**: `sudo dnf install python3-tkinter`
+- **Arch Linux**: `sudo pacman -S tk`
+- **MacOS/ Window**: 一般自带，如果没有请重新安装python
+
+
 ### Step3 运行脚本
 直接运行脚本即可
 
