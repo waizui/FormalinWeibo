@@ -1,6 +1,7 @@
 import io
 import os
 import platform
+import sqlite3
 import subprocess
 import threading
 import tkinter as tk
@@ -8,9 +9,9 @@ import urllib.request
 import uuid
 from html.parser import HTMLParser
 from tkinter import ttk
-import sqlite3
 
 from PIL import Image
+
 
 class WeiboDB(object):
     def __init__(self, path="./weibodata.db"):
@@ -128,6 +129,7 @@ class WeiboDB(object):
         res = cur.execute("SELECT * FROM bins WHERE weibo_id=?", (weibo_id,))
         bin = res.fetchall()
         return bin
+
 
 class CommentParser(HTMLParser):
     def __init__(self):
