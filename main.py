@@ -84,6 +84,11 @@ class WeiboDB(object):
         user = res.fetchall()
         return user
 
+    def get_weibo_count(self,uid):
+        cur = self.con.cursor()
+        res = cur.execute("SELECT COUNT(*) FROM weibo WHERE user_id=?",(uid,))
+        return res.fetchone()[0]
+
     def get_weibo(self, wid):
         cur = self.con.cursor()
         res = cur.execute(
@@ -187,11 +192,21 @@ class TKWindow:
         canvas.create_window((0, 0), window=items_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
         # different accroding to os
-        wheel = 1 if platform.system() == "Darwin" else 120
-        canvas.bind_all(
-            "<MouseWheel>",
-            lambda e: canvas.yview_scroll(int(-1 * (e.delta / wheel)), "units"),
-        )
+        if platform.system() == "Linux":
+            canvas.bind_all(
+                "<Button-4>",
+                lambda e: canvas.yview_scroll(-1, "units"),
+            )
+            canvas.bind_all(
+                "<Button-5>",
+                lambda e: canvas.yview_scroll(1, "units"),
+            )
+        else:
+            wheel = 1 if platform.system() == "Darwin" else 120
+            canvas.bind_all(
+                "<MouseWheel>",
+                lambda e: canvas.yview_scroll(int(-1 * (e.delta / wheel)), "units"),
+            )
         items_frame.bind(
             "<Configure>",
             lambda e: canvas.configure(scrollregion=canvas.bbox("all")),
@@ -244,18 +259,26 @@ class TKWindow:
         for weibo in weibos:
             self.add_weibo_item(items_frame, weibo)
             ttk.Separator(items_frame, orient="horizontal").pack(fill="x", pady=10)
-        weibo_count = len(weibos)
-        if weibo_count == 0:
+        cur_weibo_count = len(weibos)
+        nextoffset = cur_weibo_count + offset
+        self.show_pages(items_frame,nextoffset,count_limit,uid)
+        if cur_weibo_count == 0:
             self.add_label(items_frame, "没有微博了")
             return
 
-        nextoffset = weibo_count + offset
         btn = tk.Button(
             items_frame,
             text="下一页",
             command=lambda: self.show_weibos(uid, count_limit, nextoffset),
         )
         btn.pack()
+
+    def show_pages(self,items_frame,cur_weibo_count,pagesize,uid):
+        db = self.db
+        count = db.get_weibo_count(uid)
+        cur_page = cur_weibo_count//pagesize
+        pages = count//pagesize
+        self.add_label(items_frame, "{}/{}页".format(cur_page,pages))
 
     def openvideo(self, path):
         if platform.system() == "Windows":
