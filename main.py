@@ -84,9 +84,9 @@ class WeiboDB(object):
         user = res.fetchall()
         return user
 
-    def get_weibo_count(self,uid):
+    def get_weibo_count(self, uid):
         cur = self.con.cursor()
-        res = cur.execute("SELECT COUNT(*) FROM weibo WHERE user_id=?",(uid,))
+        res = cur.execute("SELECT COUNT(*) FROM weibo WHERE user_id=?", (uid,))
         return res.fetchone()[0]
 
     def get_weibo(self, wid):
@@ -261,7 +261,7 @@ class TKWindow:
             ttk.Separator(items_frame, orient="horizontal").pack(fill="x", pady=10)
         cur_weibo_count = len(weibos)
         nextoffset = cur_weibo_count + offset
-        self.show_pages(items_frame,nextoffset,count_limit,uid)
+        self.show_pages(items_frame, nextoffset, count_limit, uid)
         if cur_weibo_count == 0:
             self.add_label(items_frame, "没有微博了")
             return
@@ -273,12 +273,12 @@ class TKWindow:
         )
         btn.pack()
 
-    def show_pages(self,items_frame,cur_weibo_count,pagesize,uid):
+    def show_pages(self, items_frame, cur_weibo_count, pagesize, uid):
         db = self.db
         count = db.get_weibo_count(uid)
-        cur_page = cur_weibo_count//pagesize
-        pages = count//pagesize
-        self.add_label(items_frame, "{}/{}页".format(cur_page,pages))
+        cur_page = cur_weibo_count // pagesize
+        pages = count // pagesize
+        self.add_label(items_frame, "{}/{}页".format(cur_page, pages))
 
     def openvideo(self, path):
         if platform.system() == "Windows":
