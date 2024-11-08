@@ -7,8 +7,10 @@ import threading
 import tkinter as tk
 import urllib.request
 import uuid
+import math
 from html.parser import HTMLParser
 from tkinter import ttk
+import sqlite3
 
 from PIL import Image
 
@@ -260,11 +262,12 @@ class TKWindow:
             self.add_weibo_item(items_frame, weibo)
             ttk.Separator(items_frame, orient="horizontal").pack(fill="x", pady=10)
         cur_weibo_count = len(weibos)
-        nextoffset = cur_weibo_count + offset
-        self.show_pages(items_frame, nextoffset, count_limit, uid)
         if cur_weibo_count == 0:
             self.add_label(items_frame, "没有微博了")
             return
+
+        nextoffset = cur_weibo_count + offset
+        self.show_pages(items_frame,nextoffset,count_limit,uid)
 
         btn = tk.Button(
             items_frame,
@@ -276,9 +279,35 @@ class TKWindow:
     def show_pages(self, items_frame, cur_weibo_count, pagesize, uid):
         db = self.db
         count = db.get_weibo_count(uid)
-        cur_page = cur_weibo_count // pagesize
-        pages = count // pagesize
-        self.add_label(items_frame, "{}/{}页".format(cur_page, pages))
+        cur_page = math.ceil(cur_weibo_count/pagesize)
+        pages = count//pagesize + 1
+
+        l = tk.Label(
+            items_frame,
+            text= "{}/{}页".format(cur_page,pages),
+            justify="left",
+            wraplength=self.W,
+        )
+        l.pack(side=tk.LEFT)
+
+        input = tk.Entry(items_frame)
+        input.pack(side=tk.RIGHT)
+        btn = tk.Button(
+            items_frame,
+            text="jump",
+            command=lambda : self.jump_page(int(input.get()),10,uid),
+        )
+        btn.pack(side=tk.RIGHT)
+
+
+    def jump_page(self,to,pagesize,uid):
+        db = self.db
+        count = db.get_weibo_count(uid)
+        pages = count//pagesize + 1
+        if to > pages:
+            print("invalid page")
+            return
+        self.show_weibos(uid,pagesize,(to-1)*pagesize)
 
     def openvideo(self, path):
         if platform.system() == "Windows":
