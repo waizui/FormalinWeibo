@@ -1,4 +1,5 @@
 import io
+import math
 import os
 import platform
 import sqlite3
@@ -7,10 +8,8 @@ import threading
 import tkinter as tk
 import urllib.request
 import uuid
-import math
 from html.parser import HTMLParser
 from tkinter import ttk
-import sqlite3
 
 from PIL import Image
 
@@ -267,7 +266,7 @@ class TKWindow:
             return
 
         nextoffset = cur_weibo_count + offset
-        self.show_pages(items_frame,nextoffset,count_limit,uid)
+        self.show_pages(items_frame, nextoffset, count_limit, uid)
 
         btn = tk.Button(
             items_frame,
@@ -279,35 +278,34 @@ class TKWindow:
     def show_pages(self, items_frame, cur_weibo_count, pagesize, uid):
         db = self.db
         count = db.get_weibo_count(uid)
-        cur_page = math.ceil(cur_weibo_count/pagesize)
-        pages = count//pagesize + 1
+        cur_page = math.ceil(cur_weibo_count / pagesize)
+        pages = count // pagesize + 1
 
         l = tk.Label(
             items_frame,
-            text= "{}/{}页".format(cur_page,pages),
+            text="{}/{}页".format(cur_page, pages),
             justify="left",
             wraplength=self.W,
         )
         l.pack(side=tk.LEFT)
 
-        input = tk.Entry(items_frame)
+        input = tk.Entry(items_frame,width=10)
         input.pack(side=tk.RIGHT)
         btn = tk.Button(
             items_frame,
-            text="jump",
-            command=lambda : self.jump_page(int(input.get()),10,uid),
+            text="跳转",
+            command=lambda: self.jump_page(int(input.get()), 10, uid),
         )
         btn.pack(side=tk.RIGHT)
 
-
-    def jump_page(self,to,pagesize,uid):
+    def jump_page(self, to, pagesize, uid):
         db = self.db
         count = db.get_weibo_count(uid)
-        pages = count//pagesize + 1
+        pages = count // pagesize + 1
         if to > pages:
             print("invalid page")
             return
-        self.show_weibos(uid,pagesize,(to-1)*pagesize)
+        self.show_weibos(uid, pagesize, (to - 1) * pagesize)
 
     def openvideo(self, path):
         if platform.system() == "Windows":
